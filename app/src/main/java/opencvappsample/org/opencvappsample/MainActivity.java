@@ -39,6 +39,8 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     private OpenCVCamera mOpenCvCameraView;
     private boolean              mIsJavaCamera = true;
     private MenuItem             mItemSwitchCamera = null;
+    private Mat                    mRgba;
+    private Mat                    mGray;
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -73,6 +75,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
             ActivityCompat.requestPermissions(this, new String[] {android.Manifest.permission.CAMERA}, 50);
         }
         setContentView(R.layout.activity_main);
+        System.loadLibrary("mixed_sample");
 
         mOpenCvCameraView = (OpenCVCamera) findViewById(R.id.tutorial3_activity_java_surface_view);
 
@@ -117,6 +120,11 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     }
 
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
-        return inputFrame.rgba();
+        mRgba = inputFrame.rgba();
+        mGray = inputFrame.gray();
+        FindFeatures(mGray.getNativeObjAddr(), mRgba.getNativeObjAddr());
+        return mRgba;
     }
+
+    public native void FindFeatures(long matAddrGr, long matAddrRgba);
 }
