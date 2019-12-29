@@ -1,2 +1,2 @@
-OPENCV_3RDPARTY_COMPONENTS:=libjpeg-turbo libwebp libpng libtiff libjasper IlmImf libprotobuf tbb cpufeatures tegra_hal
+OPENCV_3RDPARTY_COMPONENTS:=cpufeatures ittnotify libjpeg-turbo libwebp libpng libtiff libjasper
 OPENCV_EXTRA_COMPONENTS:=z dl m log

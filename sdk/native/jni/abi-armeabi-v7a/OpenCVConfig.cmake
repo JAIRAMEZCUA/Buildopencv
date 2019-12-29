@@ -25,11 +25,11 @@
 #      - OpenCV_INCLUDE_DIRS             : The OpenCV include directories.
 #      - OpenCV_COMPUTE_CAPABILITIES     : The version of compute capability.
 #      - OpenCV_ANDROID_NATIVE_API_LEVEL : Minimum required level of Android API.
-#      - OpenCV_VERSION                  : The version of this OpenCV build: "3.4.3"
-#      - OpenCV_VERSION_MAJOR            : Major version part of OpenCV_VERSION: "3"
-#      - OpenCV_VERSION_MINOR            : Minor version part of OpenCV_VERSION: "4"
-#      - OpenCV_VERSION_PATCH            : Patch version part of OpenCV_VERSION: "3"
-#      - OpenCV_VERSION_STATUS           : Development status of this build: ""
+#      - OpenCV_VERSION                  : The version of this OpenCV build: "4.2.0"
+#      - OpenCV_VERSION_MAJOR            : Major version part of OpenCV_VERSION: "4"
+#      - OpenCV_VERSION_MINOR            : Minor version part of OpenCV_VERSION: "2"
+#      - OpenCV_VERSION_PATCH            : Patch version part of OpenCV_VERSION: "0"
+#      - OpenCV_VERSION_STATUS           : Development status of this build: "-dev"
 #
 #    Advanced variables:
 #      - OpenCV_SHARED                   : Use OpenCV as shared library
@@ -45,12 +45,12 @@
 # ======================================================
 #  Version variables:
 # ======================================================
-SET(OpenCV_VERSION 3.4.3)
-SET(OpenCV_VERSION_MAJOR  3)
-SET(OpenCV_VERSION_MINOR  4)
-SET(OpenCV_VERSION_PATCH  3)
+SET(OpenCV_VERSION 4.2.0)
+SET(OpenCV_VERSION_MAJOR  4)
+SET(OpenCV_VERSION_MINOR  2)
+SET(OpenCV_VERSION_PATCH  0)
 SET(OpenCV_VERSION_TWEAK  0)
-SET(OpenCV_VERSION_STATUS "")
+SET(OpenCV_VERSION_STATUS "-dev")
 
 include(FindPackageHandleStandardArgs)
 
@@ -76,7 +76,7 @@ endif()
 
 # Extract the directory where *this* file has been installed (determined at cmake run-time)
 # Get the absolute path with no ../.. relative marks, to eliminate implicit linker warnings
-set(OpenCV_CONFIG_PATH "${CMAKE_CURRENT_LIST_DIR}")
+get_filename_component(OpenCV_CONFIG_PATH "${CMAKE_CURRENT_LIST_DIR}" REALPATH)
 get_filename_component(OpenCV_INSTALL_PATH "${OpenCV_CONFIG_PATH}/../../../../" REALPATH)
 
 # Search packages for host system instead of packages for target system.
@@ -95,7 +95,7 @@ endif()
 
 
 # Android API level from which OpenCV has been compiled is remembered
-set(OpenCV_ANDROID_NATIVE_API_LEVEL "9")
+set(OpenCV_ANDROID_NATIVE_API_LEVEL "27")
 
 # ==============================================================
 #  Check OpenCV availability
@@ -118,8 +118,22 @@ set(OpenCV_SHARED OFF)
 # Enables mangled install paths, that help with side by side installs
 set(OpenCV_USE_MANGLED_PATHS FALSE)
 
-set(OpenCV_LIB_COMPONENTS opencv_highgui;opencv_features2d;opencv_shape;opencv_imgcodecs;opencv_ml;opencv_videoio;opencv_dnn;opencv_flann;opencv_objdetect;opencv_core;opencv_calib3d;opencv_video;opencv_superres;opencv_photo;opencv_imgproc;opencv_stitching;opencv_videostab;opencv_java)
-set(OpenCV_INCLUDE_DIRS "${OpenCV_INSTALL_PATH}/sdk/native/jni/include" "${OpenCV_INSTALL_PATH}/sdk/native/jni/include/opencv")
+set(OpenCV_LIB_COMPONENTS opencv_core;opencv_features2d;opencv_flann;opencv_highgui;opencv_imgcodecs;opencv_imgproc;opencv_ml;opencv_photo;opencv_videoio;opencv_java)
+set(__OpenCV_INCLUDE_DIRS "${OpenCV_INSTALL_PATH}/sdk/native/jni/include")
+
+set(OpenCV_INCLUDE_DIRS "")
+foreach(d ${__OpenCV_INCLUDE_DIRS})
+  get_filename_component(__d "${d}" REALPATH)
+  if(NOT EXISTS "${__d}")
+    if(NOT OpenCV_FIND_QUIETLY)
+      message(WARNING "OpenCV: Include directory doesn't exist: '${d}'. OpenCV installation may be broken. Skip...")
+    endif()
+  else()
+    list(APPEND OpenCV_INCLUDE_DIRS "${__d}")
+  endif()
+endforeach()
+unset(__d)
+
 
 if(NOT TARGET opencv_core)
   include(${CMAKE_CURRENT_LIST_DIR}/OpenCVModules${OpenCV_MODULES_SUFFIX}.cmake)
